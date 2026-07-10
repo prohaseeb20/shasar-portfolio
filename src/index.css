@@ -1,0 +1,87 @@
+:root {
+  /* Lighter, bright B2B theme variables */
+  --bg-darker: #f0f4f8; /* Light sky grey */
+  --bg-dark: #ffffff; /* Pure white sidebar/canvas background */
+  --bg-card: #ffffff; /* White cards */
+  --bg-card-hover: #f8fafc;
+  --border-color: #cbd5e1; /* Grey border */
+  --border-color-hover: #94a3b8;
+  
+  --text-primary: #0f172a; /* Dark slate text */
+  --text-secondary: #334155; /* Medium slate text */
+  --text-muted: #64748b; /* Muted grey text */
+  
+  --accent-amber: #d97706; /* Construction Amber */
+  --accent-amber-hover: #f59e0b;
+  --accent-orange: #ea580c; /* Safety Orange */
+  --accent-orange-hover: #f97316;
+  --accent-blue: #0284c7; /* Brand Sky Blue */
+  --accent-blue-hover: #0ea5e9;
+
+  --sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --heading: 'Inter', system-ui, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  font-family: var(--sans);
+  color-scheme: light;
+  color: var(--text-primary);
+  background: var(--bg-darker);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-darker);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-color-hover);
+}
+
+/* Base typography elements */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent-blue-hover);
+}
+
+button {
+  font-family: var(--sans);
+}
