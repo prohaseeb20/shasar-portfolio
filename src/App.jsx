@@ -13,6 +13,45 @@ import {
   ongoingProjects
 } from './data';
 
+const carouselSlides = [
+  {
+    id: 1,
+    image: '/images/page_11_img_4.jpg',
+    title: 'Jafurah GIS Substation (GCP 1)',
+    client: 'Larsen & Toubro Saudi Arabia LLC',
+    desc: '230 Kv GIS Substation Building and Outdoor Equipment Foundations, Civil and Finishing Works.',
+    projectId: 'completed-3',
+    tab: 'completed'
+  },
+  {
+    id: 2,
+    image: '/images/page_13_img_13.jpg',
+    title: 'Jafurah Phase II (GCP 01)',
+    client: 'Larsen & Toubro Saudi Arabia LLC',
+    desc: '230 kV Substation Building Civil and Finishing works at Jafurah Gas Field.',
+    projectId: 'completed-5',
+    tab: 'completed'
+  },
+  {
+    id: 3,
+    image: '/images/page_10_img_6.jpg',
+    title: 'PWIS Substation Building',
+    client: 'Larsen & Toubro Saudi Arabia LLC',
+    desc: 'Produced Water Injection Station Package 1 - Substation Building Civil and Finishing Works.',
+    projectId: 'completed-1',
+    tab: 'completed'
+  },
+  {
+    id: 4,
+    image: '/images/page_14_img_13.jpg',
+    title: 'Fencing & Bollards Civil Works',
+    client: 'Larsen & Toubro Saudi Arabia LLC',
+    desc: 'Ongoing physical perimeter security and civil utility protection installations.',
+    projectId: 'ongoing-1',
+    tab: 'ongoing'
+  }
+];
+
 function App() {
   // Navigation active view state
   const [activeTab, setActiveTab] = useState('default');
@@ -46,6 +85,64 @@ function App() {
 
   // Refs for smooth scroll
   const aboutUsRef = useRef(null);
+
+  // Carousel states
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  // Autoplay carousel slide change
+  useEffect(() => {
+    if (activeTab !== 'default' || isCarouselHovered) return;
+    
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % carouselSlides.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [activeTab, isCarouselHovered]);
+
+  const handleTouchStart = (e) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) {
+      setCurrentSlide(prev => (prev + 1) % carouselSlides.length);
+    }
+    if (isRightSwipe) {
+      setCurrentSlide(prev => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
+  const handleSlideClick = (slide) => {
+    setActiveTab(slide.tab);
+    if (slide.tab === 'completed') {
+      setSelectedCompletedId(slide.projectId);
+    } else {
+      setSelectedOngoingId(slide.projectId);
+    }
+    // Wait for the tab to change and render the section
+    setTimeout(() => {
+      const detailsEl = document.getElementById('project-detail-view');
+      if (detailsEl) {
+        detailsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
+  };
 
   // Toggle sidebar accordion sections
   const toggleSection = (section) => {
@@ -170,7 +267,7 @@ function App() {
           {/* Company Profile Accordion Group */}
           <div className={styles.navGroup}>
             <button 
-              className={`${styles.navHeader} ${['default', 'company-info', 'vision-values', 'hse-qa'].includes(activeTab) ? styles.navHeaderActive : ''}`}
+              className={`${styles.navHeader} ${['default', 'company-info'].includes(activeTab) ? styles.navHeaderActive : ''}`}
               onClick={() => toggleSection('companyProfile')}
             >
               <span>Company Profile</span>
@@ -190,18 +287,6 @@ function App() {
                 onClick={() => handleNavClick('company-info')}
               >
                 Company Information
-              </div>
-              <div 
-                className={`${styles.navItem} ${activeTab === 'vision-values' ? styles.navItemActive : ''}`}
-                onClick={() => handleNavClick('vision-values')}
-              >
-                Vision & Core Values
-              </div>
-              <div 
-                className={`${styles.navItem} ${activeTab === 'hse-qa' ? styles.navItemActive : ''}`}
-                onClick={() => handleNavClick('hse-qa')}
-              >
-                HSE & QA Policies
               </div>
             </div>
           </div>
@@ -288,7 +373,7 @@ function App() {
               {/* Hero Banner Section */}
               <div className={styles.heroBanner}>
                 <h2 className={styles.heroTitle}>{companyInfo.name}</h2>
-                <div style={{ color: 'var(--accent-blue)', fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '1px' }}>
+                <div style={{ color: '#38bdf8', fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '1px' }}>
                   {companyInfo.nameAr}
                 </div>
                 <p className={styles.heroSubtitle}>
@@ -296,67 +381,374 @@ function App() {
                 </p>
               </div>
 
+              {/* Interactive Image Slideshow (Carousel) */}
+              <div 
+                className={styles.carouselContainer}
+                onMouseEnter={() => setIsCarouselHovered(true)}
+                onMouseLeave={() => setIsCarouselHovered(false)}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <div 
+                  className={styles.carouselSlidesWrapper}
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {carouselSlides.map((slide) => (
+                    <div 
+                      key={slide.id} 
+                      className={styles.carouselSlide}
+                      onClick={() => handleSlideClick(slide)}
+                    >
+                      <img src={slide.image} className={slide.id === 4 ? styles.carouselImgPortrait : styles.carouselImg} alt={slide.title} />
+                      <div className={styles.carouselOverlay}>
+                        <div className={styles.carouselContent}>
+                          <span className={styles.carouselClient}>{slide.client}</span>
+                          <h3 className={styles.carouselTitle}>{slide.title}</h3>
+                          <p className={styles.carouselDesc}>{slide.desc}</p>
+                          <button className={styles.carouselBtn}>
+                            View Project Details & Specs
+                            <svg viewBox="0 0 24 24" width="16" height="16" style={{ fill: 'currentColor' }}>
+                              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Left/Right desktop chevron controls */}
+                <button 
+                  className={`${styles.carouselControl} ${styles.carouselControlLeft}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentSlide(prev => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+                  }}
+                  aria-label="Previous Slide"
+                >
+                  &#10094;
+                </button>
+                <button 
+                  className={`${styles.carouselControl} ${styles.carouselControlRight}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentSlide(prev => (prev + 1) % carouselSlides.length);
+                  }}
+                  aria-label="Next Slide"
+                >
+                  &#10095;
+                </button>
+
+                {/* Slide index dots */}
+                <div className={styles.carouselDots}>
+                  {carouselSlides.map((_, idx) => (
+                    <button 
+                      key={idx}
+                      className={`${styles.carouselDot} ${currentSlide === idx ? styles.carouselDotActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentSlide(idx);
+                      }}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
               {/* General Metrics Bar */}
               <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
-                  <span className={styles.statVal}>{totalCompletedValue}</span>
+                  <div className={styles.statCardHeader}>
+                    <svg className={styles.statIcon} viewBox="0 0 24 24" width="24" height="24">
+                      <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM17 12H7v-2h10v2zm0 4H7v-2h10v2zM12 8H7V6h5v2z"/>
+                    </svg>
+                    <span className={styles.statVal}>{totalCompletedValue}</span>
+                  </div>
                   <span className={styles.statLabel}>Completed Projects</span>
                   <span className={styles.statDesc}>High-scale industrial deliverables</span>
                 </div>
                 <div className={styles.statCard}>
-                  <span className={styles.statVal}>{totalManpower}</span>
+                  <div className={styles.statCardHeader}>
+                    <svg className={styles.statIcon} viewBox="0 0 24 24" width="24" height="24">
+                      <path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                    </svg>
+                    <span className={styles.statVal}>{totalManpower}</span>
+                  </div>
                   <span className={styles.statLabel}>Staff & Skilled Force</span>
                   <span className={styles.statDesc}>100% Aramco-certified standard team</span>
                 </div>
                 <div className={styles.statCard}>
-                  <span className={styles.statVal}>{totalVehicles + totalEquipment}</span>
+                  <div className={styles.statCardHeader}>
+                    <svg className={styles.statIcon} viewBox="0 0 24 24" width="24" height="24">
+                      <path fill="currentColor" d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1-5.5h-3V9h3v4z"/>
+                    </svg>
+                    <span className={styles.statVal}>{totalVehicles + totalEquipment}</span>
+                  </div>
                   <span className={styles.statLabel}>Fleet & Heavy Assets</span>
                   <span className={styles.statDesc}>Dump trucks, loaders, excavators</span>
                 </div>
                 <div className={styles.statCard}>
-                  <span className={styles.statVal}>4+</span>
+                  <div className={styles.statCardHeader}>
+                    <svg className={styles.statIcon} viewBox="0 0 24 24" width="24" height="24">
+                      <path fill="currentColor" d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm6 9.09c0 4.02-2.52 7.74-6 8.78-3.48-1.04-6-4.76-6-8.78V6.15l6-2.25 6 2.25v4.94zM8.5 12.5l1.5-1.5 2 2 4.5-4.5 1.5 1.5-6 6-3.5-3.5z"/>
+                    </svg>
+                    <span className={styles.statVal}>4+</span>
+                  </div>
                   <span className={styles.statLabel}>ISO Audited Standards</span>
                   <span className={styles.statDesc}>Certified Quality & HSE management</span>
                 </div>
               </div>
 
+              {/* Trusted by Industry Leaders Logo Marquee */}
+              <div className={styles.marqueeContainer}>
+                <h3 className={styles.marqueeTitle}>Trusted by Major Enterprises</h3>
+                <div className={styles.marqueeTrack}>
+                  <div className={styles.marqueeContent}>
+                    <div className={styles.logoBadge}>Saudi Aramco</div>
+                    <div className={styles.logoBadge}>SABIC</div>
+                    <div className={styles.logoBadge}>SEC</div>
+                    <div className={styles.logoBadge}>Ma'aden</div>
+                    {/* Duplicate for infinite loop effect */}
+                    <div className={styles.logoBadge}>Saudi Aramco</div>
+                    <div className={styles.logoBadge}>SABIC</div>
+                    <div className={styles.logoBadge}>SEC</div>
+                    <div className={styles.logoBadge}>Ma'aden</div>
+                  </div>
+                </div>
+              </div>
+
               {/* About Us Sub-Section (Ref target) */}
               <section ref={aboutUsRef} id="about-us" className={styles.section}>
-                <div className={styles.sectionHeader}>
-                  <div className={styles.sectionAccent}></div>
-                  <h2 className={styles.sectionTitle}>About Shasar Arabia</h2>
-                </div>
-                <div className={styles.profileGrid}>
-                  <div className={styles.aboutText}>
-                    <p className={styles.highlightParagraph}>{aboutUs.paragraphs[0]}</p>
-                    <p>{aboutUs.paragraphs[1]}</p>
-                    <p>{aboutUs.paragraphs[2]}</p>
-                    <p>{aboutUs.paragraphs[3]}</p>
-                    <p>{aboutUs.paragraphs[4]}</p>
-                    <p>{aboutUs.paragraphs[5]}</p>
+                <div className={styles.aboutZigZagContainer}>
+                  {/* Row 1: Image on Left / Text on Right */}
+                  <div className={styles.aboutZigZagRow}>
+                    {/* Left Column: Image */}
+                    <div className={styles.aboutZigZagImgWrapper}>
+                      <img 
+                        src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=800&auto=format&fit=crop" 
+                        className={styles.aboutZigZagImg} 
+                        alt="Industrial Earthworks & Excavation" 
+                      />
+                    </div>
+                    {/* Right Column: Title and Paragraph 0 & 1 */}
+                    <div className={styles.aboutZigZagTextCol}>
+                      <div className={styles.sectionHeader} style={{ marginBottom: '16px' }}>
+                        <div className={styles.sectionAccent}></div>
+                        <h2 className={styles.sectionTitle}>About Shasar Arabia</h2>
+                      </div>
+                      <div className={styles.aboutText}>
+                        <p className={styles.highlightParagraph}>{aboutUs.paragraphs[0]}</p>
+                        <p>{aboutUs.paragraphs[1]}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className={styles.quickDetailsCard}>
-                    <h3 className={styles.quickTitle}>Corporate Matrix</h3>
-                    <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>Founded</span>
-                      <span className={styles.detailVal}>2022</span>
+
+                  {/* Row 2: Text on Left / Image on Right */}
+                  <div className={`${styles.aboutZigZagRow} ${styles.alternateRow}`}>
+                    {/* Left Column: Paragraphs 2 & 3 */}
+                    <div className={styles.aboutZigZagTextCol}>
+                      <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: 'var(--text-primary)' }}>
+                        Proven Field Expertise
+                      </h3>
+                      <div className={styles.aboutText}>
+                        <p>{aboutUs.paragraphs[2]}</p>
+                        <p>{aboutUs.paragraphs[3]}</p>
+                      </div>
                     </div>
-                    <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>Corporate HQ</span>
-                      <span className={styles.detailVal}>Al Khobar, Saudi Arabia</span>
+                    {/* Right Column: Image */}
+                    <div className={styles.aboutZigZagImgWrapper}>
+                      <img 
+                        src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop" 
+                        className={styles.aboutZigZagImg} 
+                        alt="Civil Concrete Foundation works" 
+                      />
                     </div>
-                    <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>Aramco Vendor ID</span>
-                      <span className={styles.detailVal} style={{ color: 'var(--accent-blue)' }}>{companyInfo.registry.aramcoVendorId}</span>
+                  </div>
+
+                  {/* Row 3: Image on Left / Text on Right */}
+                  <div className={styles.aboutZigZagRow}>
+                    {/* Left Column: Image */}
+                    <div className={styles.aboutZigZagImgWrapper}>
+                      <img 
+                        src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800&auto=format&fit=crop" 
+                        className={styles.aboutZigZagImg} 
+                        alt="Industrial Plant Rigging & Heavy Assets" 
+                      />
                     </div>
-                    <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>SEC Bidder ID</span>
-                      <span className={styles.detailVal} style={{ color: 'var(--accent-blue)' }}>{companyInfo.registry.secVendorId}</span>
+                    {/* Right Column: Paragraph 4 */}
+                    <div className={styles.aboutZigZagTextCol}>
+                      <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: 'var(--text-primary)' }}>
+                        Executing Client Commitments
+                      </h3>
+                      <div className={styles.aboutText}>
+                        <p>{aboutUs.paragraphs[4]}</p>
+                      </div>
                     </div>
-                    <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>Certifications</span>
-                      <span className={styles.detailVal}>ISO 9001 / 14001 / 45001</span>
+                  </div>
+
+                  {/* Row 4: Text on Left / Image on Right */}
+                  <div className={`${styles.aboutZigZagRow} ${styles.alternateRow}`}>
+                    {/* Left Column: Paragraph 5 & Trusted enterprise sub-heading */}
+                    <div className={styles.aboutZigZagTextCol}>
+                      <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: 'var(--text-primary)' }}>
+                        Enterprise Partnerships
+                      </h3>
+                      <div className={styles.aboutText}>
+                        <p>{aboutUs.paragraphs[5]}</p>
+                      </div>
+                      
+                      {/* Trusted Enterprise Standards */}
+                      <div className={styles.trustedStandardsSection} style={{ marginTop: '20px' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-primary)' }}>
+                          Trusted by Industry Leaders
+                        </h4>
+                        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.6', fontWeight: '700' }}>
+                          Executing civil and infrastructure works that meet the strict compliance and safety benchmarks demanded by enterprise giants like Saudi Aramco, SABIC, SEC, and Ma'aden.
+                        </p>
+                      </div>
                     </div>
+                    {/* Right Column: Image */}
+                    <div className={styles.aboutZigZagImgWrapper}>
+                      <img 
+                        src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800&auto=format&fit=crop" 
+                        className={styles.aboutZigZagImg} 
+                        alt="Mechanical Piping Inspection" 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vision, Mission & Core Values Row */}
+                <div className={styles.visionMissionValuesRow} style={{ marginTop: '56px' }}>
+                  <div className={styles.sectionHeader} style={{ marginBottom: '24px' }}>
+                    <div className={styles.sectionAccent}></div>
+                    <h2 className={styles.sectionTitle}>Vision, Mission & Core Values</h2>
+                  </div>
+                  
+                  <div className={styles.vmvGrid}>
+                    {/* Left Column: Text */}
+                    <div className={styles.vmvTextCol}>
+                      <div style={{ marginBottom: '28px' }}>
+                        <h3 style={{ fontSize: '17px', fontWeight: '800', marginBottom: '10px', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Corporate Vision
+                        </h3>
+                        <p className={styles.sectionParagraph}>
+                          To establish Shasar Arabia as a leading benchmark for industrial contracting, civil engineering, and infrastructure development in the region. We aim to inspire trust and construct progress through sustainable engineering methods, advanced project management, and absolute dedication to environmental stewardship.
+                        </p>
+                      </div>
+
+                      <div style={{ marginBottom: '36px' }}>
+                        <h3 style={{ fontSize: '17px', fontWeight: '800', marginBottom: '10px', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Operational Mission
+                        </h3>
+                        <p className={styles.sectionParagraph}>
+                          To execute complex projects with excellence, delivering superior value and reliability to our clients. We strive to foster long-term partnerships by executing work efficiently, maintaining strict timelines, and cultivating a high-performance culture that embraces safety and innovation at every level.
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 style={{ fontSize: '17px', fontWeight: '800', marginBottom: '20px', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Core Engineering Values
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div className={styles.valueBlock}>
+                            <span className={styles.valueLabel}>Community First</span>
+                            <p className={styles.valueText}>Fostering local partnerships, encouraging knowledge transfer, and actively supporting regional growth.</p>
+                          </div>
+                          <div className={styles.valueBlock}>
+                            <span className={styles.valueLabel}>Engineering Reliability</span>
+                            <p className={styles.valueText}>Executing projects precisely on schedule with unmatched structural dependability and compliance.</p>
+                          </div>
+                          <div className={styles.valueBlock}>
+                            <span className={styles.valueLabel}>Uncompromising Integrity</span>
+                            <p className={styles.valueText}>Conducting business with absolute transparency, honesty, and ethical practices across all stakeholders.</p>
+                          </div>
+                          <div className={styles.valueBlock}>
+                            <span className={styles.valueLabel}>Zero-Harm Safety</span>
+                            <p className={styles.valueText}>Maintaining an ironclad zero-compromise approach toward health, environmental hazards, and site safety.</p>
+                          </div>
+                          <div className={styles.valueBlock} style={{ marginBottom: 0 }}>
+                            <span className={styles.valueLabel}>Flawless Quality</span>
+                            <p className={styles.valueText}>Adhering strictly to international QA/QC specifications to deliver defect-free infrastructure at the first attempt.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Visual */}
+                    <div className={styles.vmvVisualCol}>
+                      <img 
+                        src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop" 
+                        className={styles.vmvImg} 
+                        alt="Visionary Glass and Steel Infrastructure Landmark" 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* HSE Commitment & Quality Assurance Row */}
+                <div className={styles.complianceValuesRow} style={{ marginTop: '56px' }}>
+                  <div className={styles.sectionHeader} style={{ marginBottom: '24px' }}>
+                    <div className={styles.sectionAccent}></div>
+                    <h2 className={styles.sectionTitle}>HSE Commitment & Quality Assurance</h2>
+                  </div>
+                  
+                  <div className={styles.compGrid}>
+                    {/* Left Column: Visual */}
+                    <div className={styles.compVisualCol}>
+                      <img 
+                        src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop" 
+                        className={styles.compImg} 
+                        alt="Industrial Engineer Carrying Out QA/QC Welded Joint Safety Audit" 
+                      />
+                    </div>
+
+                    {/* Right Column: Text */}
+                    <div className={styles.compTextCol}>
+                      <div style={{ marginBottom: '36px' }}>
+                        <h3 style={{ fontSize: '17px', fontWeight: '800', marginBottom: '10px', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Health, Safety & Environment (HSE) Policy
+                        </h3>
+                        <p className={styles.sectionParagraph}>
+                          Our HSE policy is driven by a deep commitment to protecting human lives and preserving natural habitats. Operating under a rigorous 'Target Zero' incident framework, we ensure that every worker is comprehensively trained, every risk is systematically mapped, and every construction site is equipped with state-of-the-art hazard prevention systems. We believe that a safe workplace is the absolute foundation of structural excellence.
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 style={{ fontSize: '17px', fontWeight: '800', marginBottom: '10px', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Quality Assurance & Quality Control (QA/QC)
+                        </h3>
+                        <p className={styles.sectionParagraph}>
+                          Quality is built into every phase of our construction lifecycle, from material sourcing to final engineering verification. Our QA/QC framework follows strict ISO compliance, deploying certified inspectors to audit structural foundations, mechanical setups, and concrete formulations. By conducting rigorous non-destructive testing (NDT) and structural audits, we guarantee that all deliverables exceed municipal, national, and client-specific standards.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Corporate Matrix Table (Untouched, placed below) */}
+                <div className={styles.quickDetailsCard} style={{ marginTop: '48px' }}>
+                  <h3 className={styles.quickTitle}>Corporate Matrix</h3>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Founded</span>
+                    <span className={styles.detailVal}>2022</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Corporate HQ</span>
+                    <span className={styles.detailVal}>Al Khobar, Saudi Arabia</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Aramco Vendor ID</span>
+                    <span className={styles.detailVal} style={{ color: 'var(--accent-blue)' }}>{companyInfo.registry.aramcoVendorId}</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>SEC Bidder ID</span>
+                    <span className={styles.detailVal} style={{ color: 'var(--accent-blue)' }}>{companyInfo.registry.secVendorId}</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Certifications</span>
+                    <span className={styles.detailVal}>ISO 9001 / 14001 / 45001</span>
                   </div>
                 </div>
               </section>
@@ -412,74 +804,6 @@ function App() {
             </section>
           )}
 
-          {/* Vision & Core Values View */}
-          {activeTab === 'vision-values' && (
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <div className={styles.sectionAccent}></div>
-                <h2 className={styles.sectionTitle}>Vision, Mission & Core Values</h2>
-              </div>
-              <div className={styles.visionMissionGrid}>
-                <div className={styles.vmCard}>
-                  <h3 className={styles.vmTitle}>
-                    <svg className={styles.vmIcon} viewBox="0 0 24 24">
-                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                    </svg>
-                    Corporate Vision
-                  </h3>
-                  <p className={styles.vmContent}>{aboutUs.vision}</p>
-                </div>
-                <div className={styles.vmCard}>
-                  <h3 className={styles.vmTitle}>
-                    <svg className={styles.vmIcon} viewBox="0 0 24 24">
-                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-                    </svg>
-                    Operational Mission
-                  </h3>
-                  <p className={styles.vmContent}>{aboutUs.mission}</p>
-                </div>
-              </div>
-              <h3 className={styles.quickTitle} style={{ marginBottom: '16px' }}>Core Engineering Values</h3>
-              <div className={styles.valuesList}>
-                {aboutUs.coreValues.map((v, i) => (
-                  <div key={i} className={styles.valueCard}>
-                    <h4 className={styles.valueTitle}>{v.title}</h4>
-                    <p className={styles.valueDesc}>{v.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* HSE & QA Policies View */}
-          {activeTab === 'hse-qa' && (
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <div className={styles.sectionAccent}></div>
-                <h2 className={styles.sectionTitle}>HSE & Quality Assurance Policies</h2>
-              </div>
-              <div className={styles.policyGrid}>
-                <div className={styles.policyCard}>
-                  <div className={styles.policyHeader}>
-                    <svg className={styles.policyIcon} viewBox="0 0 24 24">
-                      <path d="M12 2L1 21h22L12 2zm0 3.5L18.5 18H5.5L12 5.5zM11 16h2v2h-2v-2zm0-7h2v5h-2V9z" />
-                    </svg>
-                    <h3 className={styles.policyCardTitle}>{hsePolicy.title}</h3>
-                  </div>
-                  <p className={styles.policyText}>{hsePolicy.content}</p>
-                </div>
-                <div className={styles.policyCard}>
-                  <div className={styles.policyHeader}>
-                    <svg className={styles.policyIcon} viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
-                    </svg>
-                    <h3 className={styles.policyCardTitle}>{qaPolicy.title}</h3>
-                  </div>
-                  <p className={styles.policyText}>{qaPolicy.content}</p>
-                </div>
-              </div>
-            </section>
-          )}
 
           {/* Civil Scope View */}
           {activeTab === 'civil-scope' && (
@@ -663,6 +987,18 @@ function App() {
                         className={`${styles.projectSelectorCard} ${selectedCompletedId === p.id ? styles.projectSelectorCardActive : ''}`}
                         onClick={() => setSelectedCompletedId(p.id)}
                       >
+                        <div className={styles.cardThumbnailContainer}>
+                          {p.images && p.images.length > 0 ? (
+                            <img src={p.images[0]} className={styles.cardThumbnail} alt="" />
+                          ) : (
+                            <div className={styles.cardThumbnailPlaceholder}>
+                              <svg viewBox="0 0 24 24" width="24" height="24" className={styles.placeholderIcon}>
+                                <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5.5 14.5L11 14l-2.5 3.5h10l-3-4-2 3.5z"/>
+                              </svg>
+                              <span style={{ fontSize: '9px', fontWeight: 600 }}>NO PHOTOGRAPH</span>
+                            </div>
+                          )}
+                        </div>
                         <div className={styles.projectSelectorHeader}>
                           <span className={styles.projectSelectorClient}>{p.client}</span>
                           <span className={styles.projectSelectorIndex}>#{p.index}</span>
@@ -743,6 +1079,18 @@ function App() {
                         className={`${styles.projectSelectorCard} ${selectedOngoingId === p.id ? styles.projectSelectorCardActive : ''}`}
                         onClick={() => setSelectedOngoingId(p.id)}
                       >
+                        <div className={styles.cardThumbnailContainer}>
+                          {p.images && p.images.length > 0 ? (
+                            <img src={p.images[0]} className={styles.cardThumbnail} alt="" />
+                          ) : (
+                            <div className={styles.cardThumbnailPlaceholder}>
+                              <svg viewBox="0 0 24 24" width="24" height="24" className={styles.placeholderIcon}>
+                                <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5.5 14.5L11 14l-2.5 3.5h10l-3-4-2 3.5z"/>
+                              </svg>
+                              <span style={{ fontSize: '9px', fontWeight: 600 }}>NO PHOTOGRAPH</span>
+                            </div>
+                          )}
+                        </div>
                         <div className={styles.projectSelectorHeader}>
                           <span className={styles.projectSelectorClient}>{p.client}</span>
                           <span className={styles.projectSelectorIndex}>Ongoing</span>

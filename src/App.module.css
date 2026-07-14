@@ -2,7 +2,7 @@
 .container {
   display: flex;
   min-height: 100vh;
-  background-color: var(--bg-darker);
+  background-color: transparent;
   color: var(--text-primary);
   font-family: var(--sans);
   position: relative;
@@ -12,7 +12,9 @@
 .sidebar {
   width: 280px;
   height: 100vh;
-  background: var(--bg-dark);
+  background: rgba(255, 255, 255, 0.82); /* Glassmorphic sidebar to let body background flow behind it */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-right: 1px solid var(--border-color);
   position: fixed;
   left: 0;
@@ -21,7 +23,7 @@
   flex-direction: column;
   z-index: 100;
   transition: transform 0.3s ease;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
 }
 
 .brand {
@@ -168,7 +170,7 @@
   flex-direction: column;
   overflow-y: auto;
   position: relative;
-  background-color: var(--bg-darker);
+  background: transparent;
 }
 
 .contentWrapper {
@@ -211,8 +213,8 @@
 
 /* Banners and stats */
 .heroBanner {
-  background: linear-gradient(95deg, rgba(255, 255, 255, 0.98) 45%, rgba(255, 255, 255, 0.85) 70%, rgba(255, 255, 255, 0.1) 100%), 
-              url('/images/about_header_bg.jpg') no-repeat right center;
+  background: linear-gradient(to right, rgba(15, 23, 42, 0.8) 35%, rgba(15, 23, 42, 0.6) 70%, rgba(15, 23, 42, 0.2) 100%), 
+              url('/images/page_3_img_1.jpg') no-repeat center center;
   background-size: cover;
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -224,7 +226,7 @@
   margin-bottom: 32px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .heroBanner::before {
@@ -243,14 +245,16 @@
   line-height: 1.2;
   margin-bottom: 6px;
   text-transform: uppercase;
-  color: var(--accent-blue);
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .heroSubtitle {
   font-size: 15px;
-  color: var(--text-secondary);
+  color: #e2e8f0;
   max-width: 850px;
   line-height: 1.6;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Metrics & Stats Row */
@@ -263,6 +267,10 @@
 
 .statCard {
   background-color: var(--bg-card);
+  background-image: 
+    linear-gradient(rgba(2, 132, 199, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2, 132, 199, 0.06) 1px, transparent 1px);
+  background-size: 16px 16px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 24px;
@@ -271,6 +279,8 @@
   gap: 8px;
   transition: all 0.2s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
 }
 
 .statCard:hover {
@@ -303,8 +313,127 @@
 /* Grid layout for profile options */
 .profileGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1.2fr 1fr;
   gap: 32px;
+  align-items: stretch;
+}
+
+.aboutZigZagContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 80px; /* Generous vertical padding between rows */
+}
+
+.aboutZigZagRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.aboutZigZagImgWrapper {
+  width: 100%;
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.aboutZigZagImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.aboutZigZagImg:hover {
+  transform: scale(1.03);
+}
+
+.aboutZigZagTextCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Merged Vision & Mission Styles */
+.visionMissionMerged {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.mergedVMCard {
+  background-color: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.mergedVMTitle {
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.mergedVMIcon {
+  width: 16px;
+  height: 16px;
+  fill: var(--accent-blue);
+}
+
+.mergedVMContent {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Merged Core Values Tag List Styles */
+.coreValuesMerged {
+  margin-top: 28px;
+}
+
+.coreValuesMergedTitle {
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.valuesTagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.valueTagItem {
+  flex: 1 1 calc(50% - 12px);
+  background-color: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.valueTagLabel {
+  color: var(--accent-blue);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.valueTagDesc {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .aboutText {
@@ -1822,3 +1951,585 @@
   }
 }
 
+/* Carousel and metric icons styles */
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-dark);
+}
+
+.carouselSlidesWrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carouselSlide {
+  min-width: 100%;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.carouselImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s ease;
+}
+
+.carouselImgPortrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transition: transform 1.2s ease;
+}
+
+.carouselSlide:hover .carouselImg,
+.carouselSlide:hover .carouselImgPortrait {
+  transform: scale(1.05);
+}
+
+.carouselOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to top,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(15, 23, 42, 0.6) 50%,
+    rgba(15, 23, 42, 0.2) 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  padding: 40px;
+}
+
+.carouselContent {
+  color: #ffffff;
+  max-width: 650px;
+  text-align: left;
+}
+
+.carouselClient {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--accent-blue);
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.carouselTitle {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  line-height: 1.2;
+  color: #ffffff;
+}
+
+.carouselDesc {
+  font-size: 14px;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.carouselBtn {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.carouselBtn:hover {
+  background: var(--accent-blue-hover);
+  transform: translateY(-1px);
+}
+
+.carouselControl {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.carouselControl:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.carouselControlLeft {
+  left: 20px;
+}
+
+.carouselControlRight {
+  right: 20px;
+}
+
+.carouselDots {
+  position: absolute;
+  bottom: 20px;
+  right: 40px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.carouselDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.carouselDotActive {
+  background: var(--accent-blue);
+  width: 24px;
+  border-radius: 5px;
+}
+
+.statCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.statIcon {
+  width: 28px;
+  height: 28px;
+  color: var(--accent-blue);
+  flex-shrink: 0;
+}
+
+.aboutLeftContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.aboutRightImageContainer {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.aboutRightImg {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  object-fit: cover;
+  border-radius: 16px;
+  transition: transform 0.5s ease;
+}
+
+.aboutRightImg:hover {
+  transform: scale(1.03);
+}
+
+.cardThumbnailContainer {
+  width: 100%;
+  height: 140px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cardThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardThumbnailPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+}
+
+.placeholderIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+/* Global CSS Media Query under 768px */
+@media (max-width: 768px) {
+  .heroBanner {
+    padding: 32px 24px;
+    min-height: 200px;
+    background: linear-gradient(to right, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%), 
+                url('/images/page_3_img_1.jpg') no-repeat center center;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .heroTitle {
+    font-size: 24px;
+  }
+  
+  .heroSubtitle {
+    font-size: 13px;
+  }
+  
+  .carouselContainer {
+    height: 300px;
+    margin-bottom: 24px;
+  }
+  
+  .carouselOverlay {
+    padding: 20px;
+  }
+  
+  .carouselTitle {
+    font-size: 18px;
+  }
+  
+  .carouselDesc {
+    font-size: 12px;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .carouselControl {
+    display: none;
+  }
+  
+  .carouselDots {
+    right: 20px;
+    bottom: 12px;
+  }
+  
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .profileGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .aboutZigZagContainer {
+    gap: 48px;
+  }
+  
+  .aboutZigZagRow {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .aboutZigZagRow.alternateRow {
+    flex-direction: column-reverse; /* Force Right Image to stack above Left Text for Rows 2, 4, 6 */
+  }
+  
+  .aboutZigZagImgWrapper {
+    height: 280px;
+  }
+
+  .visionMissionMerged {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .valueTagItem {
+    flex: 1 1 100%;
+  }
+  
+  .certificatesGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .projectSplitLayout {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .projectMasterList {
+    width: 100% !important;
+    max-height: 300px !important;
+    padding-right: 0;
+    margin-bottom: 0;
+  }
+  
+  .projectDetailView {
+    padding: 16px !important;
+    width: 100%;
+  }
+  
+  .projectSpecsTable {
+    margin-bottom: 20px;
+  }
+  
+  .projectSpecRow {
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+  }
+  
+  .projectSpecLabel {
+    width: 100%;
+    font-size: 11px;
+  }
+  
+  .projectSpecVal {
+    font-size: 12px;
+  }
+  
+  .galleryGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .galleryItem {
+    height: 160px;
+  }
+  
+  .lightboxOverlay {
+    padding: 20px;
+  }
+
+  .vmvGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .vmvVisualCol {
+    min-height: 280px;
+    height: 280px;
+  }
+
+  .compGrid {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 28px;
+  }
+
+  .compVisualCol {
+    min-height: 280px;
+    height: 280px;
+    width: 100%;
+  }
+}
+
+/* Trusted by Industry Leaders Logo Marquee Styles */
+.marqueeContainer {
+  margin-bottom: 32px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px 24px;
+  overflow: hidden;
+}
+
+.marqueeTitle {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.marqueeTrack {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  width: 100%;
+}
+
+.marqueeContent {
+  display: inline-flex;
+  gap: 32px;
+  animation: marqueeScroll 25s linear infinite;
+}
+
+.logoBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background-color: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  min-width: 140px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+}
+
+@keyframes marqueeScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Vision, Mission & Core Values Row Styles */
+.visionMissionValuesRow {
+  width: 100%;
+}
+
+.vmvGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 48px;
+  align-items: stretch;
+}
+
+.vmvTextCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.vmvVisualCol {
+  border-radius: 8px; /* matching our metric cards */
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  height: 100%;
+  min-height: 380px; /* Make it large and tall to balance the text column */
+  position: relative;
+}
+
+.vmvImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.vmvImg:hover {
+  transform: scale(1.03);
+}
+
+/* HSE Commitment & Quality Assurance Row Styles */
+.complianceValuesRow {
+  width: 100%;
+}
+
+.compGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 48px;
+  align-items: stretch;
+}
+
+.compTextCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.compVisualCol {
+  border-radius: 8px; /* matching our metric cards */
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  height: 100%;
+  min-height: 380px; /* Make it large and tall to balance the text column */
+  position: relative;
+}
+
+.compImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.compImg:hover {
+  transform: scale(1.03);
+}
+
+/* Typography & Writing Format Updates */
+.sectionParagraph {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin: 0;
+}
+
+.valueBlock {
+  border-left: 3px solid var(--accent-blue);
+  padding-left: 16px;
+  margin-bottom: 18px;
+}
+
+.valueLabel {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.valueText {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
